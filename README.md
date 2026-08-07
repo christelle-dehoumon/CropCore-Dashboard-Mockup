@@ -2,7 +2,7 @@
 
 A front-end dashboard mockup for **CropCore**, a crop storage management concept designed for the mango value chain (harvest → storage → drying/processing → export).
 
-![CropCore dashboard preview](dashboard_preview(1).png)
+![CropCore dashboard preview](dashboard-preview(1).png)
 
 **Live demo:** [christelle-dehoumon.github.io/CropCore-Dashboard-Mockup](https://christelle-dehoumon.github.io/CropCore-Dashboard-Mockup/)
 
