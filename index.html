@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crop Storage Dashboard — Prototype</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-content">
+        <img src="logo.png" alt="Infineon logo" class="brand-logo">
+        <div class="brand-copy">
+          <div class="name">CropCore</div>
+          <div class="tag">Crop Storage Management</div>
+        </div>
+      </div>
+      <button class="icon-btn sidebar-close" aria-label="Close menu"><i data-lucide="x"></i></button>
+    </div>
+    <div class="nav-title">Menu</div>
+    <div id="nav"></div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="alert('Logout action')">
+        <span class="logout-icon"><i data-lucide="power"></i></span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Crop Storage Dashboard</h1>
+        <p id="pageSub">Farm Sustainable Management System</p>
+      </div>
+      <div class="search-bar topbar-search">
+        <input id="overviewSearch" type="search" placeholder="Search by ID, product, temperature or humidity" autocomplete="off" oninput="updateSearchResults(this.value.trim().toLowerCase())" onsearch="updateSearchResults(this.value.trim().toLowerCase())">
+        <div class="search-results" id="searchDropdown" aria-live="polite"></div>
+      </div>
+      <div class="top-right">
+        <button class="icon-btn menu-toggle" aria-label="Open menu"><i data-lucide="menu" class="topbar-icon"></i></button>
+        <div class="topbar-item topbar-label"><i data-lucide="calendar" class="topbar-icon"></i><span class="topbar-text">July 2026</span></div>
+        <div class="topbar-item topbar-label"><i data-lucide="clock" class="topbar-icon"></i><span class="topbar-text">10:42 AM</span></div>
+        <div class="topbar-item status"><span class="status-dot"></span>Online</div>
+        <button class="icon-btn" onclick="alert('Notification: Batch BT003 — High temperature detected!')"><i data-lucide="bell" class="topbar-icon"></i><span class="badge">1</span></button>
+        <button class="icon-btn"><i data-lucide="user" class="topbar-icon"></i></button>
+      </div>
+    </div>
+
+    <div id="overviewPage">
+      <!-- STAT ROW -->
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- GRID: gauge + 2 charts + alert -->
+      <div class="grid">
+        <div class="card gauge-card">
+          <h3> Storage Capacity</h3>
+          <div class="gauge-wrap">
+            <canvas id="gaugeChart"></canvas>
+            <div class="gauge-center">
+              <div class="gauge-pct">0%</div>
+              <div class="gauge-sub">132 / 240 m²</div>
+            </div>
+          </div>
+          <div class="legend">
+            <span><span class="dot" style="background:var(--green)"></span>0–70% Optimal</span>
+            <span><span class="dot" style="background:var(--yellow)"></span>70–90% High</span>
+            <span><span class="dot" style="background:var(--red)"></span>&gt;90% Critical</span>
+          </div>
+        </div>
+
+        <div class="card chart-card">
+          <h3><i data-lucide="thermometer" class="section-icon"></i>Temperature Trend (°C) <span style="margin-left:auto;color:var(--muted2);font-size:10px;">Last 24 hours</span></h3>
+          <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+        </div>
+
+        <div class="card chart-card">
+          <h3><i data-lucide="droplet" class="section-icon"></i>Humidity Trend (%) <span style="margin-left:auto;color:var(--muted2);font-size:10px;">Last 24 hours</span></h3>
+          <div class="chart-wrap"><canvas id="humChart"></canvas></div>
+        </div>
+
+        <div class="card alert-card">
+          <h3 class="alert-title"> Active Alert</h3>
+          <div class="alert-box">
+            <div class="b">Batch BT003</div>
+            <div class="s">High Temperature Detected</div>
+            <div class="kv"><span>Current Temperature</span><b style="color:var(--red)">21.0 °C</b></div>
+            <div class="kv"><span>Target Range</span><b>15 – 20 °C</b></div>
+            <div class="kv"><span>Detected</span><b>31/07/2026 10:35 AM</b></div>
+            <button class="btn" onclick="openAlertModal()">View Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-row">
+        <div class="card">
+          <h3 style="display:flex;justify-content:space-between;align-items:center;">
+            <span><i data-lucide="package" class="section-icon"></i>Stored Batches</span>
+            <span style="color:var(--yellow); cursor:pointer; text-transform:none; font-size:11.5px;" onclick="setPage('batches')">View All Batches</span>
+          </h3>
+          <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Batch ID</th><th>Product</th><th>Quantity</th><th>Temperature</th><th>Humidity</th><th>FIFO Status</th><th>Last Updated</th></tr>
+            </thead>
+            <tbody id="batchTableBody"></tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3> Environmental Sensors</h3>
+          <div id="sensorList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="otherPage" style="display:none;"></div>
+  </div>
+  <div class="sidebar-backdrop"></div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="alertOverlay">
+  <div class="modal">
+    <h2>Batch BT003 — Detail</h2>
+    <p>High temperature detected in Bulk Dry Storage zone.</p>
+    <div class="modal-row"><span>Product</span><b>Unripe Mango</b></div>
+    <div class="modal-row"><span>Quantity</span><b>200 kg</b></div>
+    <div class="modal-row"><span>Current Temperature</span><b style="color:var(--red)">21.0 °C</b></div>
+    <div class="modal-row"><span>Target Range</span><b>15 – 20 °C</b></div>
+    <div class="modal-row"><span>Humidity</span><b>58 %</b></div>
+    <div class="modal-row"><span>FIFO Status</span><b style="color:var(--red)">At Risk</b></div>
+    <div class="modal-row"><span>Recommended action</span><b>Move batch or adjust cooling</b></div>
+    <button class="modal-close" onclick="closeModal('alertOverlay')">Close</button>
+  </div>
+</div>
+
+<div class="overlay" id="batchOverlay">
+  <div class="modal" id="batchModalContent"></div>
+</div>
+
+<script src="script.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
